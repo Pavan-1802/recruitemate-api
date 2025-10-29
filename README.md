@@ -24,7 +24,7 @@ Before setting up the project, ensure you have the following installed:
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/Pavan-1802/recruitemate-api
 cd recruitmate-api
 ```
 
@@ -55,10 +55,7 @@ PORT=3000
 # Email Configuration (for email verification and candidate notifications)
 EMAIL_SERVICE=gmail
 EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_email_password
-
-# AI/ML Configuration (if using external AI services)
-OPENAI_API_KEY=your_openai_api_key
+EMAIL_PASS=your_app_password
 ```
 
 ### 4. Database Setup
@@ -248,7 +245,7 @@ Authorization: Bearer <your-jwt-token>
 
 ## File Upload
 
-The API supports resume file uploads in various formats (PDF, DOC, DOCX). Files are processed to:
+The API supports resume file uploads in various formats PDF format. Files are processed to:
 - Extract candidate email addresses
 - Extract candidate names from filenames
 - Calculate relevance scores using AI/ML algorithms
