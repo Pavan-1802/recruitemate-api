@@ -10,6 +10,7 @@ A comprehensive recruitment management API built with Node.js, Express, and Post
 - 👥 **Candidate Management** - Track and manage job applicants
 - 📧 **Email Integration** - Send automated emails to candidates
 - 🤖 **AI-Powered Scoring** - Intelligent resume-to-job matching
+- ✍️ **AI Text Generation** - Generate emails and job descriptions using Google Gemini AI
 
 ## Prerequisites
 
@@ -56,7 +57,9 @@ PORT=3000
 EMAIL_SERVICE=gmail
 EMAIL_USER=your_email@gmail.com
 EMAIL_PASS=your_app_password
-```
+
+# AI Configuration
+GEMINI_API_KEY=your_google_gemini_api_key
 
 ### 4. Database Setup
 
@@ -128,6 +131,18 @@ npm start
 The server will start on `http://localhost:3000` (or the port specified in your .env file).
 
 ## API Endpoints
+
+### AI Routes (`/ai`)
+
+#### Generate Text
+- **POST** `/ai/generate-text`
+- **Body:**
+  ```json
+  {
+    "prompt": "Write a professional job description for a software engineer position"
+  }
+  ```
+- **Description:** Uses Google Gemini AI to generate text content such as job descriptions, emails, or other recruitment-related content
 
 ### Authentication Routes (`/auth`)
 
@@ -264,6 +279,12 @@ The system uses advanced AI algorithms to:
 - **Pending:** Score < threshold
 - **Rejected:** Manual status update
 
+### AI Text Generation
+The system integrates Google Gemini AI to generate high-quality content:
+- **Job Descriptions:** Create compelling job postings with relevant details
+- **Email Templates:** Generate personalized emails for candidate communications
+- **Recruitment Content:** Assist with various recruitment-related text generation tasks
+
 ## Database Schema
 
 ### Users Table
@@ -308,6 +329,7 @@ The API returns appropriate HTTP status codes:
 ### Project Structure
 ```
 ├── controllers/          # Request handlers
+│   ├── aiController.js
 │   ├── authController.js
 │   ├── candidateController.js
 │   ├── emailControllers.js
@@ -318,6 +340,7 @@ The API returns appropriate HTTP status codes:
 │   ├── authMiddleware.js
 │   └── upload.js
 ├── routes/              # API routes
+│   ├── aiRoutes.js
 │   ├── authRoutes.js
 │   ├── candidateRoutes.js
 │   ├── emailRoutes.js

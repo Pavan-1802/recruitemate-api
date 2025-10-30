@@ -9,11 +9,14 @@ const authRoutes = require("./routes/authRoutes");
 const jobRoutes = require("./routes/jobRoutes");
 const candidateRoutes = require("./routes/candidateRoutes");
 const emailRoutes = require("./routes/emailRoutes");
+const aiRoutes = require("./routes/aiRoutes");
+
 
 app.use(cors());
 app.use(express.json());
 connectToDb();
 
+app.use("/ai", aiRoutes);
 app.use("/jobs", jobRoutes);
 app.use("/auth", authRoutes);
 app.use("/candidates", candidateRoutes);
