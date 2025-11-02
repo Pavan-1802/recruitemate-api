@@ -21,7 +21,7 @@ let embedder;
 })();
 
 const generateVerificationToken = (email) => {
-  return jwt.sign({ email }, JWT_SECRET, { expiresIn: "1h" });
+  return jwt.sign({ email }, JWT_SECRET);
 };
 
 const getStatus = (score, threshold) => {
@@ -65,6 +65,36 @@ const sendVerificationEmail = async (email, token) => {
   } catch (error) {
     console.error("Error sending verification email:", error);
     throw new Error("Failed to send verification email");
+  }
+};
+
+const sendPasswordResetEmail = async (email, token) => {
+  try {
+    const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
+    const mailOptions = {
+      from: process.env.FROM_EMAIL || process.env.EMAIL_USER,
+      to: email,
+      subject: "Password Reset - Recruitmate",
+      html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #333;">Password Reset - Recruitmate</h2>
+                    <p>Hello,</p>
+                    <p>Please click the link below to reset your password:</p>
+                    <a href="${resetLink}" style="display: inline-block; background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 20px 0;">Reset Password</a>
+                    <p>If you didn’t request this password reset, please ignore this email.</p>
+                    <p><strong>Note:</strong> This link will expire in 15 minutes for security reasons.</p>
+                    <br>
+                    <p>Best regards,<br>Recruitmate Team</p>
+                </div>
+            `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Password reset email sent:", info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error("Error sending password reset email:", error);
+    throw new Error("Failed to send password reset email");
   }
 };
 
@@ -145,5 +175,6 @@ module.exports = {
   getScore,
   extractNameFromFilename,
   getStatus,
-  sendEmail
+  sendEmail,
+  sendPasswordResetEmail,
 };
