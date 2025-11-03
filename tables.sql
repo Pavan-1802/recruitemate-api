@@ -8,7 +8,6 @@ CREATE TABLE users (
     token_expiry TIMESTAMPTZ
 );
 
--- Create 'jobs' table
 CREATE TABLE jobs (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
@@ -18,7 +17,6 @@ CREATE TABLE jobs (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create 'candidates' table
 CREATE TABLE candidates (
     id SERIAL PRIMARY KEY,
     job_id INTEGER NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
@@ -29,3 +27,6 @@ CREATE TABLE candidates (
     status VARCHAR(50) DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX idx_jobs_user_id ON jobs(user_id);
+CREATE INDEX idx_candidates_job_id ON candidates(job_id);
