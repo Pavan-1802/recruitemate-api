@@ -131,7 +131,7 @@ const getScore = async (buffer, jobDescription) => {
       jobEmbedding.data
     );
 
-    return Math.round(score * 100);
+    return (score * 100);
   } catch (error) {
     console.error("Error calculating semantic similarity:", error);
     throw new Error("Failed to calculate similarity score");

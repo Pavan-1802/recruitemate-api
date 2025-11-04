@@ -47,18 +47,46 @@ const updateStatus = async (req, res) => {
   }
 };
 
+
 const fetchCandidates = async (req, res) => {
   try {
     const { jobId } = req.params;
-    const candidates = await pool.query(
-      "SELECT * FROM candidates WHERE job_id = $1 ORDER BY score DESC",
+    
+    const page = parseInt(req.query.page || "1", 10);
+    const limit = parseInt(req.query.limit || "10", 10);
+    const offset = (page - 1) * limit;
+
+    const candidatesPromise = pool.query(
+      "SELECT * FROM candidates WHERE job_id = $1 ORDER BY score DESC LIMIT $2 OFFSET $3",
+      [jobId, limit, offset]
+    );
+
+    const totalPromise = pool.query(
+      "SELECT COUNT(*) FROM candidates WHERE job_id = $1",
       [jobId]
     );
-    const job = await pool.query(
+
+    const jobPromise = pool.query(
       "SELECT title FROM jobs WHERE id = $1",
       [jobId]
     );
-    res.status(200).json({ candidates: candidates.rows, jobTitle: job.rows[0]?.title });
+
+    const [candidatesResult, totalResult, jobResult] = await Promise.all([
+      candidatesPromise,
+      totalPromise,
+      jobPromise,
+    ]);
+
+    const totalCandidates = parseInt(totalResult.rows[0].count, 10);
+    const totalPages = Math.ceil(totalCandidates / limit);
+
+    res.status(200).json({
+      candidates: candidatesResult.rows,
+      jobTitle: jobResult.rows[0]?.title,
+      totalPages: totalPages,
+      currentPage: page,
+    });
+    
   } catch (error) {
     console.error("Error fetching candidates:", error);
     res.status(500).json({ error: "Failed to fetch candidates" });
