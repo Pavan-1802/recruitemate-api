@@ -10,6 +10,7 @@ const jobRoutes = require("./routes/jobRoutes");
 const candidateRoutes = require("./routes/candidateRoutes");
 const emailRoutes = require("./routes/emailRoutes");
 const aiRoutes = require("./routes/aiRoutes");
+const resumeRoutes = require("./routes/resumeRoutes");
 
 
 app.use(cors());
@@ -21,6 +22,7 @@ app.use("/jobs", jobRoutes);
 app.use("/auth", authRoutes);
 app.use("/candidates", candidateRoutes);
 app.use("/emails", emailRoutes);
+app.use("/resumes", resumeRoutes);
 
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Welcome to recruitmate API" });
