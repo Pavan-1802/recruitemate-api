@@ -11,7 +11,7 @@ const candidateRoutes = require("./routes/candidateRoutes");
 const emailRoutes = require("./routes/emailRoutes");
 const aiRoutes = require("./routes/aiRoutes");
 const resumeRoutes = require("./routes/resumeRoutes");
-
+const interviewRoutes = require("./routes/interviewRoutes")
 
 app.use(cors());
 app.use(express.json());
@@ -23,6 +23,7 @@ app.use("/auth", authRoutes);
 app.use("/candidates", candidateRoutes);
 app.use("/emails", emailRoutes);
 app.use("/resumes", resumeRoutes);
+app.use("/interviews", interviewRoutes)
 
 app.get("/", (req, res) => {
   res.status(200).json({ message: "Welcome to recruitmate API" });

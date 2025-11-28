@@ -34,7 +34,6 @@ const updateStatus = async (req, res) => {
   try {
     const { candidateId } = req.params;
     const { status } = req.body;
-    console.log("Updating candidate ID:", candidateId, "to status:", status);
     await pool.query(
       "UPDATE candidates SET status = $1 WHERE id = $2",
       [status, candidateId]

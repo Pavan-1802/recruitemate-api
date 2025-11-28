@@ -28,5 +28,16 @@ CREATE TABLE candidates (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE interviews (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    candidate_id INTEGER NOT NULL REFERENCES candidates(id) ON DELETE CASCADE,
+    start_time TIMESTAMPTZ NOT NULL,
+    duration INTEGER NOT NULL,
+	reminder INTEGER NOT NULL DEFAULT 15,
+    link TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)
+
 CREATE INDEX idx_jobs_user_id ON jobs(user_id);
 CREATE INDEX idx_candidates_job_id ON candidates(job_id);
