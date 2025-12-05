@@ -4,13 +4,15 @@ A comprehensive recruitment management API built with Node.js, Express, and Post
 
 ## Features
 
-- 🔐 **User Authentication** - Register, login, and email verification
+- 🔐 **User Authentication** - Register, login, email verification, and password recovery
 - 📝 **Job Management** - Create, read, update, and delete job postings
 - 📄 **Resume Processing** - Upload and automatically score resumes using AI
 - 👥 **Candidate Management** - Track and manage job applicants
 - 📧 **Email Integration** - Send automated emails to candidates
 - 🤖 **AI-Powered Scoring** - Intelligent resume-to-job matching
 - ✍️ **AI Text Generation** - Generate emails and job descriptions using Google Gemini AI
+- 📅 **Interview Scheduling** - Schedule, reschedule, and manage candidate interviews
+- 📋 **Resume Review** - Review and manage resumes on hold
 
 ## Prerequisites
 
@@ -114,6 +116,18 @@ CREATE TABLE candidates (
     status VARCHAR(50) DEFAULT 'pending',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Create 'interviews' table
+CREATE TABLE interviews (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    candidate_id INTEGER NOT NULL REFERENCES candidates(id) ON DELETE CASCADE,
+    start_time TIMESTAMPTZ NOT NULL,
+    duration INTEGER NOT NULL,
+    reminder INTEGER NOT NULL DEFAULT 15,
+    link TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 ```
 
 ### 5. Start the Server
@@ -172,6 +186,26 @@ The server will start on `http://localhost:3000` (or the port specified in your 
   }
   ```
 - **Response:** Returns JWT token for authentication
+
+#### Forgot Password
+- **POST** `/auth/forgot-password`
+- **Body:**
+  ```json
+  {
+    "email": "john@example.com"
+  }
+  ```
+- **Description:** Sends a password reset email with a token
+
+#### Reset Password
+- **POST** `/auth/reset-password/:token`
+- **Body:**
+  ```json
+  {
+    "password": "newpassword123"
+  }
+  ```
+- **Description:** Resets user password using the token sent to their email
 
 ### Job Management Routes (`/jobs`)
 
@@ -250,6 +284,57 @@ The server will start on `http://localhost:3000` (or the port specified in your 
   ```
 - **Description:** Sends emails to all candidates with a specific status for a job
 
+### Resume Management Routes (`/resumes`)
+
+*All resume routes require authentication (JWT token in Authorization header)*
+
+#### Get Resumes On Hold
+- **GET** `/resumes`
+- **Description:** Retrieves all resumes with "on hold" status for the authenticated user
+
+### Interview Management Routes (`/interviews`)
+
+*All interview routes require authentication (JWT token in Authorization header)*
+
+#### Schedule Interview
+- **POST** `/interviews`
+- **Body:**
+  ```json
+  {
+    "candidateId": 1,
+    "startTime": "2025-12-10T10:00:00Z",
+    "duration": 60,
+    "reminder": 15,
+    "link": "https://meet.google.com/abc-defg-hij"
+  }
+  ```
+- **Description:** Schedules an interview for an accepted candidate and updates their status to "interview scheduled"
+
+#### Get Accepted Candidates
+- **GET** `/interviews/accepted`
+- **Description:** Retrieves all accepted candidates eligible for interview scheduling
+
+#### Get All Interviews
+- **GET** `/interviews`
+- **Description:** Retrieves all scheduled interviews for the authenticated user with candidate and job details
+
+#### Reschedule Interview
+- **PUT** `/interviews/:id`
+- **Body:**
+  ```json
+  {
+    "startTime": "2025-12-11T14:00:00Z",
+    "duration": 45,
+    "reminder": 30,
+    "link": "https://meet.google.com/new-link"
+  }
+  ```
+- **Description:** Reschedules an existing interview with new details
+
+#### Cancel Interview
+- **DELETE** `/interviews/:id`
+- **Description:** Cancels an interview and reverts candidate status back to "accepted"
+
 ## Authentication
 
 The API uses JWT (JSON Web Tokens) for authentication. After successful login, include the token in the Authorization header:
@@ -277,6 +362,8 @@ The system uses advanced AI algorithms to:
 ### Automatic Status Assignment
 - **Accepted:** Score >= threshold
 - **Pending:** Score < threshold
+- **On Hold:** Resumes pending review
+- **Interview Scheduled:** Candidate has a scheduled interview
 - **Rejected:** Manual status update
 
 ### AI Text Generation
@@ -311,8 +398,18 @@ The system integrates Google Gemini AI to generate high-quality content:
 - `email`: Candidate email
 - `resume`: Resume file data (binary)
 - `score`: AI-calculated relevance score
-- `status`: Application status
+- `status`: Application status (pending, accepted, rejected, on hold, interview scheduled)
 - `created_at`: Application timestamp
+
+### Interviews Table
+- `id`: Primary key
+- `user_id`: Reference to users table
+- `candidate_id`: Reference to candidates table
+- `start_time`: Interview start time (timestamp with timezone)
+- `duration`: Interview duration in minutes
+- `reminder`: Reminder time in minutes before interview
+- `link`: Interview meeting link (Google Meet, Zoom, etc.)
+- `created_at`: Interview creation timestamp
 
 ## Error Handling
 
@@ -333,7 +430,9 @@ The API returns appropriate HTTP status codes:
 │   ├── authController.js
 │   ├── candidateController.js
 │   ├── emailControllers.js
-│   └── jobController.js
+│   ├── interviewController.js
+│   ├── jobController.js
+│   └── resumeController.js
 ├── lib/                  # Database configuration
 │   └── db.js
 ├── middleware/           # Custom middleware
@@ -344,7 +443,9 @@ The API returns appropriate HTTP status codes:
 │   ├── authRoutes.js
 │   ├── candidateRoutes.js
 │   ├── emailRoutes.js
-│   └── jobRoutes.js
+│   ├── interviewRoutes.js
+│   ├── jobRoutes.js
+│   └── resumeRoutes.js
 ├── index.js            # Main application file
 ├── package.json        # Dependencies and scripts
 ├── tables.sql          # Database schema
